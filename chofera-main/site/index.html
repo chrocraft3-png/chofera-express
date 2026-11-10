@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rutas Express</title>
+  <meta name="description" content="Pide un viaje desde tu caserío. Los choferes contraofertan y tú eliges." />
+  <style>
+    :root {
+      --green: #059669;
+      --green-dark: #047857;
+      --ink: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --amber: #fef3c7;
+      --amber-ink: #92400e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .mark {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: var(--green); color: #fff;
+      display: grid; place-items: center; font-size: 18px;
+    }
+    nav { display: flex; gap: 16px; font-size: 14px; font-weight: 600; }
+    nav a { text-decoration: none; color: var(--muted); }
+    nav a:hover { color: var(--ink); }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+    .hero { padding: 48px 0 24px; }
+    h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.03em; }
+    .lead { font-size: 18px; color: var(--muted); max-width: 38rem; margin: 0 0 24px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    button, .btn {
+      border: 0; border-radius: 12px; padding: 12px 16px;
+      font-weight: 700; font-size: 15px; cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--green); color: #fff; text-decoration: none; display: inline-block; }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0 8px; }
+    .step, .card, form {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .step { padding: 16px; }
+    .step strong { display: block; margin-bottom: 4px; }
+    .step span { color: var(--green); font-size: 13px; font-weight: 800; }
+    .step p { margin: 0; color: var(--muted); font-size: 14px; }
+    section { padding: 12px 0 36px; }
+    h2 { font-size: 22px; margin: 0 0 14px; }
+    .board { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: start; }
+    form { padding: 16px; display: grid; gap: 10px; }
+    label { font-size: 13px; font-weight: 700; display: grid; gap: 6px; }
+    input {
+      width: 100%; border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 12px; font: inherit; font-size: 15px;
+    }
+    input:focus { outline: 2px solid #a7f3d0; border-color: var(--green); }
+    .list { display: grid; gap: 10px; }
+    .card { padding: 14px 16px; }
+    .card header { position: static; border: 0; padding: 0; background: transparent; margin-bottom: 6px; }
+    .route { font-weight: 800; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .price { font-weight: 800; color: var(--green-dark); }
+    .pill {
+      display: inline-block; background: var(--amber); color: var(--amber-ink);
+      border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 800;
+    }
+    .pill.ok { background: #d1fae5; color: #065f46; }
+    .offers { margin-top: 10px; display: grid; gap: 6px; }
+    .offer {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: var(--bg); border-radius: 10px; padding: 8px 10px; font-size: 14px;
+    }
+    .tiny { padding: 6px 10px; border-radius: 8px; font-size: 13px; }
+    .empty { color: var(--muted); padding: 24px; text-align: center; }
+    .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    footer { padding: 24px 0 40px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+    @media (max-width: 760px) {
+      nav { display: none; }
+      .steps, .board { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="mark">R</div> Rutas Express</div>
+    <nav>
+      <a href="#como">Cómo funciona</a>
+      <a href="#tablero">Tablero</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <h1>Pide un viaje desde tu caserío.</h1>
+      <p class="lead">Publicas a dónde vas y cuánto ofreces. Los choferes responden con su precio y tú eliges con quién salir.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#tablero">Abrir el tablero</a>
+        <a class="btn btn-ghost" href="#como">Ver los 3 pasos</a>
+      </div>
+      <div class="steps" id="como">
+        <article class="step"><span>01</span><strong>Publicas</strong><p>Caserío, destino y tu oferta.</p></article>
+        <article class="step"><span>02</span><strong>Contraofertan</strong><p>Un chofer propone otro precio.</p></article>
+        <article class="step"><span>03</span><strong>Aceptas</strong><p>Cierras el viaje con quien elijas.</p></article>
+      </div>
+    </div>
+
+    <section id="tablero">
+      <h2>Tablero de hoy</h2>
+      <div class="board">
+        <form id="form">
+          <label>Tu nombre
+            <input name="nombre" required placeholder="María" maxlength="40" />
+          </label>
+          <label>Caserío
+            <input name="caserio" required placeholder="San José" maxlength="40" />
+          </label>
+          <label>Destino
+            <input name="destino" required placeholder="Plaza de armas" maxlength="60" />
+          </label>
+          <label>Tu oferta (S/)
+            <input name="oferta" required type="number" min="1" max="500" step="1" placeholder="15" />
+          </label>
+          <button class="btn-primary" type="submit">Publicar solicitud</button>
+          <p class="note">Se guarda solo en este navegador. Nadie más ve tu lista.</p>
+        </form>
+        <div id="list" class="list" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">Rutas Express · demo del tablero de viajes. Los datos no salen de tu dispositivo.</div>
+  </footer>
+
+  <script>
+    const KEY = "rutas-express-solicitudes";
+    const listEl = document.getElementById("list");
+    const form = document.getElementById("form");
+
+    const seed = [
+      {
+        id: "s1",
+        nombre: "Lucía",
+        caserio: "El Porvenir",
+        destino: "Mercado central",
+        oferta: 12,
+        estado: "abierta",
+        ofertas: [{ id: "o1", chofer: "Carlos", precio: 15 }]
+      },
+      {
+        id: "s2",
+        nombre: "José",
+        caserio: "La Huaca",
+        destino: "Hospital",
+        oferta: 20,
+        estado: "abierta",
+        ofertas: []
+      }
+    ];
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return seed;
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : seed;
+      } catch {
+        return seed;
+      }
+    }
+
+    function save(items) {
+      localStorage.setItem(KEY, JSON.stringify(items));
+    }
+
+    let items = load();
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 9);
+    }
+
+    function render() {
+      if (!items.length) {
+        listEl.innerHTML = '<div class="card empty">Todavía no hay solicitudes.</div>';
+        return;
+      }
+      listEl.innerHTML = items.map((item) => {
+        const estado = item.estado === "aceptada"
+          ? '<span class="pill ok">Aceptada</span>'
+          : '<span class="pill">Abierta</span>';
+        const offers = (item.ofertas || []).map((o) => `
+          <div class="offer">
+            <span>${escapeHtml(o.chofer)} · S/ ${Number(o.precio)}</span>
+            ${item.estado === "abierta"
+              ? `<button class="btn-primary tiny" data-accept="${item.id}" data-offer="${o.id}">Aceptar</button>`
+              : ""}
+          </div>`).join("");
+        const contra = item.estado === "abierta" ? `
+          <form class="offers" data-contra="${item.id}">
+            <div class="offer">
+              <input name="chofer" required placeholder="Nombre del chofer" maxlength="40" />
+              <input name="precio" required type="number" min="1" max="500" placeholder="S/" style="max-width:90px" />
+              <button class="btn-ghost tiny" type="submit">Ofertar</button>
+            </div>
+          </form>` : "";
+        return `
+          <article class="card">
+            <div class="row">
+              <div class="route">${escapeHtml(item.caserio)} → ${escapeHtml(item.destino)}</div>
+              ${estado}
+            </div>
+            <div class="row" style="margin-top:6px">
+              <span class="meta">${escapeHtml(item.nombre)}</span>
+              <span class="price">Oferta S/ ${Number(item.oferta)}</span>
+            </div>
+            <div class="offers">${offers}</div>
+            ${contra}
+          </article>`;
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      items = [{
+        id: uid(),
+        nombre: String(data.get("nombre")).trim(),
+        caserio: String(data.get("caserio")).trim(),
+        destino: String(data.get("destino")).trim(),
+        oferta: Number(data.get("oferta")),
+        estado: "abierta",
+        ofertas: []
+      }, ...items];
+      save(items);
+      form.reset();
+      render();
+    });
+
+    listEl.addEventListener("submit", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLFormElement)) return;
+      const id = target.dataset.contra;
+      if (!id) return;
+      event.preventDefault();
+      const data = new FormData(target);
+      const item = items.find((entry) => entry.id === id);
+      if (!item || item.estado !== "abierta") return;
+      item.ofertas.push({
+        id: uid(),
+        chofer: String(data.get("chofer")).trim(),
+        precio: Number(data.get("precio"))
+      });
+      save(items);
+      render();
+    });
+
+    listEl.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-accept]");
+      if (!button) return;
+      const item = items.find((entry) => entry.id === button.dataset.accept);
+      const offer = item && item.ofertas.find((entry) => entry.id === button.dataset.offer);
+      if (!item || !offer) return;
+      item.estado = "aceptada";
+      item.ofertas = [offer];
+      save(items);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
